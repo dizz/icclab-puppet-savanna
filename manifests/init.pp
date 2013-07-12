@@ -35,6 +35,13 @@
 #
 # Copyright 2013 Your name here, unless otherwise noted.
 #
+# TODOs
+# - need to install disk builder and create image
+#   or generate and install
+#   https://savanna.readthedocs.org/en/latest/userdoc/diskimagebuilder.html
+# - parameterise config - keystone and database
+# - provide mysql DB support - only sqlite atm
+
 class savanna (
   $local_settings_template = 'savanna/savanna.conf.erb',
 ) {
@@ -45,22 +52,16 @@ class savanna (
     }
   }
 
+  # Waiting for new release before using pip
   exec { "savanna":
     command => "pip install http://tarballs.openstack.org/savanna/savanna-master.tar.gz#egg=savanna",
     path => "/usr/bin:/usr/sbin:/bin:/usr/local/bin",
     #refreshonly => true,
   }
 
-  # Waiting for new version
-  #package { "savanna":
-  #	ensure => installed,
-  #	provider => pip,
-  #} ~>
-
   group { 'savanna':
     ensure  => present,
     system  => true,
-    #require => Exec['savanna'],
   } ~>
 
   user { 'savanna':
@@ -69,7 +70,6 @@ class savanna (
     system  => true,
     home    => '/var/lib/savanna',
     shell   => '/bin/false'
-    #require => Exec['savanna'],
   } ~>
 
   file { "/var/lib/savanna":
@@ -104,6 +104,7 @@ class savanna (
     group  => 'root',
   } ~>
 
+  #TODO(dizz): parameterise config
   file { "/etc/savanna/savanna-api.conf":
     path    => '/etc/init/savanna-api.conf',
     ensure => file,
@@ -113,30 +114,12 @@ class savanna (
     group  => 'root',
   } ~>
 
-  #exec { "cp /usr/local/share/savanna/savanna.conf.sample /etc/savanna/savanna.conf":
-  #	command => "cp /usr/local/share/savanna/savanna.conf.sample /etc/savanna/savanna.conf",
-  #	path => "/usr/bin:/usr/sbin:/bin:/usr/local/bin",
-  #	refreshonly => true,
-  #}
-
   exec { "/usr/local/bin/savanna-db-manage --config-file /etc/savanna/savanna.conf current":
   	command => "/usr/local/bin/savanna-db-manage --config-file /etc/savanna/savanna.conf current",
   	#path => "/usr/bin:/usr/sbin:/bin:/usr/local/bin",
   	#refreshonly => true,
   } ~>
 
-  #exec { "savanna-api --config-file /etc/savanna/savanna.conf":
-  #  command => "/usr/local/bin/savanna-api --config-file /etc/savanna/savanna.conf &",
-  #  #path => "/usr/bin:/usr/sbin:/bin:/usr/local/bin",
-  #  #refreshonly => true,
-  #}
-  
-  # need to install disk builder and create image
-  # or generate and install
-  # https://savanna.readthedocs.org/en/latest/userdoc/diskimagebuilder.html
-
-  # no init scripts
-  # --config-file /etc/savanna/savanna.conf
   service { "savanna-api":
     enable => true,
   	ensure => running,
