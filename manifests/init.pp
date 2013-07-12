@@ -35,39 +35,71 @@
 #
 # Copyright 2013 Your name here, unless otherwise noted.
 #
-class savanna {
+class savanna (
+  $local_settings_template = 'savanna/savanna.conf.erb',
+) {
 
-  package { "python-pip":
-  	ensure => installed,
-  } ~>
+  if !defined(Package['python-pip']) {
+      package { 'python-pip':
+      ensure => latest,
+    }
+  }
 
-  package { "savanna":
-  	ensure => installed,
-  	provider => pip
-  } ~>
+  exec { "savanna":
+    command => "pip install http://tarballs.openstack.org/savanna/savanna-master.tar.gz#egg=savanna",
+    path => "/usr/bin:/usr/sbin:/bin:/usr/local/bin",
+    #refreshonly => true,
+  }
+
+  # Waiting for new version
+  #package { "savanna":
+  #	ensure => installed,
+  #	provider => pip,
+  #} ~>
 
   file { "/etc/savanna":
-  	ensure => file,
+  	ensure => "directory",
+    owner  => "root",
+    group  => "root",
+    mode   => 750,
   } ~>
 
-  exec { "cp /usr/local/share/savanna/savanna.conf.sample /etc/savanna/savanna.conf":
-  	command => "cp /usr/local/share/savanna/savanna.conf.sample /etc/savanna/savanna.conf",
-  	#path => "/usr/bin:/usr/sbin:/bin:/usr/local/bin",
-  	#refreshonly => true,
-  } ~>
-
-  exec { "savanna-manage --config-file /etc/savanna/savanna.conf reset-db --with-gen-templates":
-  	command => "savanna-manage --config-file /etc/savanna/savanna.conf reset-db --with-gen-templates",
-  	#path => "/usr/bin:/usr/sbin:/bin:/usr/local/bin",
-  	#refreshonly => true,
-  } ~>
-
-  # --config-file /etc/savanna/savanna.conf
-  service { "savanna-api":
-    enable => true,
-  	ensure => running,
-  	#hasrestart => true,
-  	#hasstatus => true,
-  	#require => Class["config"],
+  file { "/etc/savanna/savanna.conf":
+    path    => '/etc/savanna/savanna.conf',
+    ensure => file,
+    content => template($local_settings_template)
   }
+
+  #exec { "cp /usr/local/share/savanna/savanna.conf.sample /etc/savanna/savanna.conf":
+  #	command => "cp /usr/local/share/savanna/savanna.conf.sample /etc/savanna/savanna.conf",
+  #	path => "/usr/bin:/usr/sbin:/bin:/usr/local/bin",
+  #	refreshonly => true,
+  #} ~>
+
+  # danger danger! everytime this runs it will delete the db contents!
+  exec { "/usr/local/bin/savanna-db-manage --config-file /etc/savanna/savanna.conf current":
+  	command => "/usr/local/bin/savanna-db-manage --config-file /etc/savanna/savanna.conf current",
+  	#path => "/usr/bin:/usr/sbin:/bin:/usr/local/bin",
+  	#refreshonly => true,
+  } ~>
+
+  exec { "savanna-api --config-file /etc/savanna/savanna.conf":
+    command => "/usr/local/bin/savanna-api --config-file /etc/savanna/savanna.conf &",
+    #path => "/usr/bin:/usr/sbin:/bin:/usr/local/bin",
+    #refreshonly => true,
+  }
+  
+  # need to install disk builder and create image
+  # or generate and install
+  # https://savanna.readthedocs.org/en/latest/userdoc/diskimagebuilder.html
+
+  # no init scripts
+  # --config-file /etc/savanna/savanna.conf
+  # service { "savanna-api":
+  # enable => true,
+  #	ensure => running,
+  #	hasrestart => true,
+  #	hasstatus => true,
+  	#require => Class["config"],
+  #}
 }
