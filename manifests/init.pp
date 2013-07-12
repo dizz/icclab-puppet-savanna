@@ -57,37 +57,79 @@ class savanna (
   #	provider => pip,
   #} ~>
 
+  group { 'savanna':
+    ensure  => present,
+    system  => true,
+    #require => Exec['savanna'],
+  } ~>
+
+  user { 'savanna':
+    ensure  => present,
+    gid     => 'savanna',
+    system  => true,
+    home    => '/var/lib/savanna',
+    shell   => '/bin/false'
+    #require => Exec['savanna'],
+  } ~>
+
+  file { "/var/lib/savanna":
+    ensure => "directory",
+    owner  => "savanna",
+    group  => "savanna",
+    mode   => 750,
+  } ~>
+
   file { "/etc/savanna":
   	ensure => "directory",
-    owner  => "root",
-    group  => "root",
+    owner  => "savanna",
+    group  => "savanna",
     mode   => 750,
   } ~>
 
   file { "/etc/savanna/savanna.conf":
     path    => '/etc/savanna/savanna.conf',
     ensure => file,
-    content => template($local_settings_template)
-  }
+    content => template($local_settings_template),
+    owner  => "savanna",
+    group  => "savanna",
+    mode   => 750,
+  } ~>
+
+  file { "/etc/init.d/savanna-api":
+    path    => '/etc/init.d/savanna-api',
+    ensure => file,
+    content => template('savanna/savanna-api.erb'),
+    mode   => 755,
+    owner  => 'root',
+    group  => 'root',
+  } ~>
+
+  file { "/etc/savanna/savanna-api.conf":
+    path    => '/etc/init/savanna-api.conf',
+    ensure => file,
+    content => template('savanna/savanna-api.conf.erb'),
+    mode   => 755,
+    owner  => 'root',
+    group  => 'root',
+  } ~>
 
   #exec { "cp /usr/local/share/savanna/savanna.conf.sample /etc/savanna/savanna.conf":
   #	command => "cp /usr/local/share/savanna/savanna.conf.sample /etc/savanna/savanna.conf",
   #	path => "/usr/bin:/usr/sbin:/bin:/usr/local/bin",
   #	refreshonly => true,
-  #} ~>
+  #}
 
-  # danger danger! everytime this runs it will delete the db contents!
   exec { "/usr/local/bin/savanna-db-manage --config-file /etc/savanna/savanna.conf current":
   	command => "/usr/local/bin/savanna-db-manage --config-file /etc/savanna/savanna.conf current",
   	#path => "/usr/bin:/usr/sbin:/bin:/usr/local/bin",
   	#refreshonly => true,
   } ~>
 
-  exec { "savanna-api --config-file /etc/savanna/savanna.conf":
-    command => "/usr/local/bin/savanna-api --config-file /etc/savanna/savanna.conf &",
-    #path => "/usr/bin:/usr/sbin:/bin:/usr/local/bin",
-    #refreshonly => true,
-  }
+  #exec { "savanna-api --config-file /etc/savanna/savanna.conf":
+  #  command => "/usr/local/bin/savanna-api --config-file /etc/savanna/savanna.conf &",
+  #  #path => "/usr/bin:/usr/sbin:/bin:/usr/local/bin",
+  #  #refreshonly => true,
+  #}
   
   # need to install disk builder and create image
   # or generate and install
@@ -95,11 +137,11 @@ class savanna (
 
   # no init scripts
   # --config-file /etc/savanna/savanna.conf
-  # service { "savanna-api":
-  # enable => true,
-  #	ensure => running,
-  #	hasrestart => true,
-  #	hasstatus => true,
+  service { "savanna-api":
+    enable => true,
+  	ensure => running,
+  	hasrestart => true,
+  	hasstatus => true,
   	#require => Class["config"],
-  #}
+  }
 }
