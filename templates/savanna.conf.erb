@@ -5,10 +5,10 @@
 #
 
 # set host (string value)
-#host=
+host=<%= savanna_host %>
 
-# set port (integer value) - CONFIGME
-#port=8386
+# set port (integer value)
+port=<%= savanna_port %>
 
 
 #
@@ -16,26 +16,26 @@
 #
 
 # Protocol used to access OpenStack Identity service (string
-# value)  - CONFIGME
-#os_auth_protocol=http
+# value)
+os_auth_protocol=<%= keystone_auth_protocol %>
 
 # IP or hostname of machine on which OpenStack Identity
-# service is located (string value) - CONFIGME
-#os_auth_host=127.0.0.1
+# service is located (string value)
+os_auth_host=<%= keystone_auth_host %>
 
-# Port of OpenStack Identity service (string value) - CONFIGME
-#os_auth_port=35357
+# Port of OpenStack Identity service (string value)
+os_auth_port=<%= keystone_auth_port %>
 
 # This OpenStack user is used to verify provided tokens. The
 # user must have admin role in <os_admin_tenant_name> tenant
-# (string value) - CONFIGME
-#os_admin_username=savanna
+# (string value)
+os_admin_username=<%= keystone_user %>
 
-# Password of the admin user (string value) - CONFIGME
-#os_admin_password=savanna
+# Password of the admin user (string value)
+os_admin_password=<%= keystone_password %>
 
-# Name of tenant where the user is admin (string value) - CONFIGME
-#os_admin_tenant_name=savanna
+# Name of tenant where the user is admin (string value)
+os_admin_tenant_name=<%= int_keystone_tenant %>
 
 
 #
@@ -57,8 +57,8 @@
 #disable_process_locking=false
 
 # Directory to use for lock files. Default to a temp directory
-# (string value)  - CONFIGME
-lock_path=/var/lock/savanna/
+# (string value)
+lock_path=<%= scope.lookupvar("savanna::params::savanna_lockdir") %>
 
 
 #
@@ -66,12 +66,12 @@ lock_path=/var/lock/savanna/
 #
 
 # Print debugging output (set logging level to DEBUG instead
-# of default WARNING level). (boolean value) - CONFIGME
-#debug=false
+# of default WARNING level). (boolean value)
+debug=<%= savanna_debug %>
 
 # Print more verbose output (set logging level to INFO instead
-# of default WARNING level). (boolean value) - CONFIGME
-#verbose=false
+# of default WARNING level). (boolean value)
+verbose=<%= savanna_verbose %>
 
 # Log output to standard error (boolean value)
 #use_stderr=true
@@ -129,14 +129,14 @@ lock_path=/var/lock/savanna/
 
 # (Optional) Name of log file to output to. If no default is
 # set, logging will go to stdout. (string value)
-#log_file=<None> - CONFIGME
+log_file=<%= scope.lookupvar("savanna::params::savanna_logdir") %>/savanna.log
 
 # (Optional) The base directory used for relative --log-file
 # paths (string value)
-#log_dir=<None>
+# log_dir=<%= scope.lookupvar("savanna::params::savanna_logdir") %>
 
 # Use syslog for logging. (boolean value)
-#use_syslog=false
+use_syslog=<%= scope.lookupvar("savanna::params::savanna_syslog") %>
 
 # syslog facility to receive log lines (string value)
 #syslog_log_facility=LOG_USER
@@ -178,11 +178,11 @@ lock_path=/var/lock/savanna/
 # inter-cluster communication, while floating ones will be
 # used by Savanna to configure nodes. Also floating IPs will
 # be exposed in service URLs. (boolean value)
-#use_floating_ips=true
+use_floating_ips=<%= scope.lookupvar("savanna::params::savanna_usefips") %>
 
 # The suffix of the node's FQDN. In nova-network that is
 # dhcp_domain config parameter (string value)
-#node_domain=novalocal
+node_domain=<%= scope.lookupvar("savanna::params::savanna_node_domain") %>
 
 
 [database]
@@ -191,8 +191,9 @@ lock_path=/var/lock/savanna/
 # Options defined in savanna.db.migration.cli
 #
 
-# URL to database (string value) - CONFIGME
-connection=sqlite:////tmp/savanna-server.db
+# URL to database (string value)
+# connection=sqlite:////tmp/savanna-server.db
+connection=mysql://<%= savanna_db_user %>:<%= savanna_db_password %>@<%= db_host %>/<%= savanna_db_name %>
 
 
 #

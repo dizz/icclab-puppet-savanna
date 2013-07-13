@@ -44,8 +44,31 @@
 # - provide mysql DB support - only sqlite atm
 
 class savanna (
-  $local_settings_template = 'savanna/savanna.conf.erb',
+  $savanna_host              = '127.0.0.1',
+  $savanna_port              = '8386',
+  $db_host                   = '127.0.0.1',
+  $savanna_db_name           = 'savanna',
+  $savanna_db_user           = 'savanna',
+  $savanna_db_password       = 'savanna',
+  $keystone_auth_protocol    = 'http',
+  $keystone_auth_host        = '127.0.0.1',
+  $keystone_auth_port        = '35357',
+  $keystone_user             = 'savanna',
+  $keystone_password         = 'savanna',
+  $keystone_tenant           = undef,
+  $hadoop_image_builder      = true,
+  $savanna_verbose           = false,
+  $savanna_debug             = false,
+  $local_settings_template   = 'savanna/savanna.conf.erb',
 ) {
+
+  include savanna::params
+
+  if !$keystone_tenant {
+    $int_keystone_tenant = $keystone_user
+  }else {
+    $int_keystone_tenant = $keystone_tenant
+  }
 
   if !defined(Package['python-pip']) {
       package { 'python-pip':
@@ -53,12 +76,17 @@ class savanna (
     }
   }
 
-  # Waiting for new release before using pip
-  exec { "savanna":
-    command => "pip install http://tarballs.openstack.org/savanna/savanna-master.tar.gz#egg=savanna",
-    path => "/usr/bin:/usr/sbin:/bin:/usr/local/bin",
-    #refreshonly => true,
+  if $savanna::params::development {
+    info('Installing and using the savanna development version.')
+    exec { "savanna":
+      command => "pip install http://tarballs.openstack.org/savanna/savanna-master.tar.gz#egg=savanna",
+      path => "/usr/bin:/usr/sbin:/bin:/usr/local/bin",
+    }
+  } else {
+    error('Please set horizon::params::development to true. Waiting for new release before using pip.')
   }
+  
+  # scope.lookupvar("horizon::params::savana_dashboard") 
 
   group { 'savanna':
     ensure  => present,
@@ -80,6 +108,20 @@ class savanna (
     mode   => 750,
   } ~>
 
+  file { "/var/log/savanna":
+    ensure => "directory",
+    owner  => "savanna",
+    group  => "savanna",
+    mode   => 750,
+  } ~>
+
+  file { "/var/log/savanna/savanna.log":
+    ensure => "file",
+    owner  => "savanna",
+    group  => "savanna",
+    mode   => 750,
+  } ~>
+
   file { "/etc/savanna":
   	ensure => "directory",
     owner  => "savanna",
@@ -94,38 +136,44 @@ class savanna (
     owner  => "savanna",
     group  => "savanna",
     mode   => 750,
-  } ~>
+  }
 
-  file { "/etc/init.d/savanna-api":
-    path    => '/etc/init.d/savanna-api',
-    ensure => file,
-    content => template('savanna/savanna-api.erb'),
-    mode   => 755,
-    owner  => 'root',
-    group  => 'root',
-  } ~>
+  if $::osfamily == 'Debian' {
 
-  #TODO(dizz): parameterise config
-  file { "/etc/savanna/savanna-api.conf":
-    path    => '/etc/init/savanna-api.conf',
-    ensure => file,
-    content => template('savanna/savanna-api.conf.erb'),
-    mode   => 755,
-    owner  => 'root',
-    group  => 'root',
-  } ~>
+    file { "/etc/init.d/savanna-api":
+      path    => '/etc/init.d/savanna-api',
+      ensure => file,
+      content => template('savanna/savanna-api.erb'),
+      mode   => 755,
+      owner  => 'root',
+      group  => 'root',
+    } ~>
+
+    file { "/etc/savanna/savanna-api.conf":
+      path    => '/etc/init/savanna-api.conf',
+      ensure => file,
+      content => template('savanna/savanna-api.conf.erb'),
+      mode   => 755,
+      owner  => 'root',
+      group  => 'root',
+    }
+  } else {
+    error('Savanna cannot be installed on this operating system. It does not have the supported initscripts. There is only support for Debian-based systems.')
+  }
 
   exec { "/usr/local/bin/savanna-db-manage --config-file /etc/savanna/savanna.conf current":
   	command => "/usr/local/bin/savanna-db-manage --config-file /etc/savanna/savanna.conf current",
-  	#path => "/usr/bin:/usr/sbin:/bin:/usr/local/bin",
-  	#refreshonly => true,
   } ~>
 
+  #TODO(dizz) need to notify if service config changes
   service { "savanna-api":
     enable => true,
   	ensure => running,
   	hasrestart => true,
   	hasstatus => true,
-  	#require => Class["config"],
+  }
+
+  if $hadoop_image_builder {
+    warning ('Installation of the hadoop image builder tools is not implemented')
   }
 }

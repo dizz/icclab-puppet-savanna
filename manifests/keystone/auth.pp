@@ -9,7 +9,7 @@ class savanna::keystone::auth (
   $admin_address      = '127.0.0.1',
   $internal_address   = '127.0.0.1',
   $port               = '8386',
-  
+  $public_port        = undef,
   $region             = 'RegionOne',
   $public_protocol    = 'http'
 ) {
@@ -17,6 +17,12 @@ class savanna::keystone::auth (
   # removed $volume_version     = 'v1',
 
   Keystone_user_role["${auth_name}@${tenant}"] ~> Service <| name == 'savanna-api' |>
+
+  if ! $public_port {
+    $real_public_port = $port
+  } else {
+    $real_public_port = $public_port
+  }
 
   keystone_user { $auth_name:
     ensure   => present,
