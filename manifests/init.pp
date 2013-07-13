@@ -40,6 +40,7 @@
 #   or generate and install
 #   https://savanna.readthedocs.org/en/latest/userdoc/diskimagebuilder.html
 # - parameterise config - keystone and database
+#   db and keystone setup, note the todo in keystone service URL
 # - provide mysql DB support - only sqlite atm
 
 class savanna (

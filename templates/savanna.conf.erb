@@ -7,7 +7,7 @@
 # set host (string value)
 #host=
 
-# set port (integer value)
+# set port (integer value) - CONFIGME
 #port=8386
 
 
@@ -16,26 +16,26 @@
 #
 
 # Protocol used to access OpenStack Identity service (string
-# value)
+# value)  - CONFIGME
 #os_auth_protocol=http
 
 # IP or hostname of machine on which OpenStack Identity
-# service is located (string value)
+# service is located (string value) - CONFIGME
 #os_auth_host=127.0.0.1
 
-# Port of OpenStack Identity service (string value)
+# Port of OpenStack Identity service (string value) - CONFIGME
 #os_auth_port=35357
 
 # This OpenStack user is used to verify provided tokens. The
 # user must have admin role in <os_admin_tenant_name> tenant
-# (string value)
-#os_admin_username=admin
+# (string value) - CONFIGME
+#os_admin_username=savanna
 
-# Password of the admin user (string value)
-#os_admin_password=nova
+# Password of the admin user (string value) - CONFIGME
+#os_admin_password=savanna
 
-# Name of tenant where the user is admin (string value)
-#os_admin_tenant_name=admin
+# Name of tenant where the user is admin (string value) - CONFIGME
+#os_admin_tenant_name=savanna
 
 
 #
@@ -57,8 +57,8 @@
 #disable_process_locking=false
 
 # Directory to use for lock files. Default to a temp directory
-# (string value)
-#lock_path=<None>
+# (string value)  - CONFIGME
+lock_path=/var/lock/savanna/
 
 
 #
@@ -66,11 +66,11 @@
 #
 
 # Print debugging output (set logging level to DEBUG instead
-# of default WARNING level). (boolean value)
+# of default WARNING level). (boolean value) - CONFIGME
 #debug=false
 
 # Print more verbose output (set logging level to INFO instead
-# of default WARNING level). (boolean value)
+# of default WARNING level). (boolean value) - CONFIGME
 #verbose=false
 
 # Log output to standard error (boolean value)
@@ -129,7 +129,7 @@
 
 # (Optional) Name of log file to output to. If no default is
 # set, logging will go to stdout. (string value)
-#log_file=<None>
+#log_file=<None> - CONFIGME
 
 # (Optional) The base directory used for relative --log-file
 # paths (string value)
@@ -191,7 +191,7 @@
 # Options defined in savanna.db.migration.cli
 #
 
-# URL to database (string value)
+# URL to database (string value) - CONFIGME
 connection=sqlite:////tmp/savanna-server.db
 
 
