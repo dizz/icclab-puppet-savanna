@@ -38,10 +38,6 @@
 # TODOs
 # - need to install disk builder and create image
 #   or generate and install
-#   https://savanna.readthedocs.org/en/latest/userdoc/diskimagebuilder.html
-# - parameterise config - keystone and database
-#   db and keystone setup, note the todo in keystone service URL
-# - provide mysql DB support - only sqlite atm
 
 class savanna (
   $savanna_host              = '127.0.0.1',
