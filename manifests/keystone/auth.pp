@@ -11,7 +11,8 @@ class savanna::keystone::auth (
   $port               = '8386',
   $public_port        = undef,
   $region             = 'RegionOne',
-  $public_protocol    = 'http'
+  $public_protocol    = 'http',
+  $internal_protocol    = 'http',
 ) {
 
   # removed $volume_version     = 'v1',
@@ -48,8 +49,8 @@ class savanna::keystone::auth (
     keystone_endpoint { "${region}/${auth_name}":
       ensure       => present,
       public_url   => "${public_protocol}://${public_address}:${real_public_port}/",
-      internal_url => "http://${internal_address}:${port}/",
-      admin_url    => "http://${admin_address}:${port}/",
+      internal_url => "${internal_protocol}://${internal_address}:${port}/",
+      admin_url    => "${internal_protocol}://${admin_address}:${port}/",
     }
   }
 }
