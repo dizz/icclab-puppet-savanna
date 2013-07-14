@@ -73,9 +73,9 @@ class savanna (
   }
 
   if $savanna::params::development {
-    info('Installing and using the savanna development version.')
+    info("Installing and using the savanna development version. URL: ${savanna::params::development_build_url}")
     exec { "savanna":
-      command => "pip install http://tarballs.openstack.org/savanna/savanna-master.tar.gz#egg=savanna",
+      command => "pip install ${savanna::params::development_build_url}",
       path => "/usr/bin:/usr/sbin:/bin:/usr/local/bin",
     }
   } else {
@@ -132,6 +132,7 @@ class savanna (
     owner  => "savanna",
     group  => "savanna",
     mode   => 750,
+    before => Exec['savanna-db-manage']
   }
 
   if $::osfamily == 'Debian' {
@@ -157,8 +158,10 @@ class savanna (
     error('Savanna cannot be installed on this operating system. It does not have the supported initscripts. There is only support for Debian-based systems.')
   }
 
-  exec { "/usr/local/bin/savanna-db-manage --config-file /etc/savanna/savanna.conf current":
-  	command => "/usr/local/bin/savanna-db-manage --config-file /etc/savanna/savanna.conf current",
+  exec { "savanna-db-manage":
+  	command   => "/usr/local/bin/savanna-db-manage --config-file /etc/savanna/savanna.conf current",
+    logoutput => on_failure,
+    require   => Class['savanna::db::mysql']
   } ~>
 
   #TODO(dizz) need to notify if service config changes
