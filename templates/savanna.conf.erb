@@ -35,7 +35,8 @@ os_admin_username=<%= keystone_user %>
 os_admin_password=<%= keystone_password %>
 
 # Name of tenant where the user is admin (string value)
-os_admin_tenant_name=<%= int_keystone_tenant %>
+
+os_admin_tenant_name=<%= scope.lookupvar("savanna::keystone::auth::tenant") %>
 
 
 #

@@ -38,6 +38,9 @@
 # TODOs
 # - need to install disk builder and create image
 #   or generate and install
+# - use a puppet type for configuration file
+# - structure into sub-manifests
+# - clean up documentation
 
 class savanna (
   $savanna_host              = '127.0.0.1',

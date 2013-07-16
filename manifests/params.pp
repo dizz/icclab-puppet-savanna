@@ -12,5 +12,5 @@ class savanna::params {
   #installs developement version from github builds
   $development           = true
   $development_build_url = 'http://tarballs.openstack.org/savanna/savanna-master.tar.gz#egg=savanna'
-  # $development_build_url = 'http://tarballs.openstack.org/savanna/savanna-0.2.rc1.tar.gz#egg=savanna'
+  #$development_build_url = 'http://tarballs.openstack.org/savanna/savanna-0.2.tar.gz#egg=savanna'
 }

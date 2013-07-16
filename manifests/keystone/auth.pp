@@ -12,7 +12,7 @@ class savanna::keystone::auth (
   $public_port        = undef,
   $region             = 'RegionOne',
   $public_protocol    = 'http',
-  $internal_protocol    = 'http',
+  $internal_protocol  = 'http',
 ) {
 
   # removed $volume_version     = 'v1',
