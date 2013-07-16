@@ -55,7 +55,6 @@ class savanna (
   $keystone_user             = 'savanna',
   $keystone_password         = 'savanna',
   $keystone_tenant           = undef,
-  $hadoop_image_builder      = true,
   $savanna_verbose           = false,
   $savanna_debug             = false,
   $local_settings_template   = 'savanna/savanna.conf.erb',
@@ -173,9 +172,5 @@ class savanna (
   	ensure => running,
   	hasrestart => true,
   	hasstatus => true,
-  }
-
-  if $hadoop_image_builder {
-    warning ('Installation of the hadoop image builder tools is not implemented')
   }
 }
