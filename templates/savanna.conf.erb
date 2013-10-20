@@ -5,10 +5,10 @@
 #
 
 # set host (string value)
-host=<%= savanna_host %>
+host=<%= @savanna_host %>
 
 # set port (integer value)
-port=<%= savanna_port %>
+port=<%= @savanna_port %>
 
 
 #
@@ -17,22 +17,22 @@ port=<%= savanna_port %>
 
 # Protocol used to access OpenStack Identity service (string
 # value)
-os_auth_protocol=<%= keystone_auth_protocol %>
+os_auth_protocol=<%= @keystone_auth_protocol %>
 
 # IP or hostname of machine on which OpenStack Identity
 # service is located (string value)
-os_auth_host=<%= keystone_auth_host %>
+os_auth_host=<%= @keystone_auth_host %>
 
 # Port of OpenStack Identity service (string value)
-os_auth_port=<%= keystone_auth_port %>
+os_auth_port=<%= @keystone_auth_port %>
 
 # This OpenStack user is used to verify provided tokens. The
 # user must have admin role in <os_admin_tenant_name> tenant
 # (string value)
-os_admin_username=<%= keystone_user %>
+os_admin_username=<%= @keystone_user %>
 
 # Password of the admin user (string value)
-os_admin_password=<%= keystone_password %>
+os_admin_password=<%= @keystone_password %>
 
 # Name of tenant where the user is admin (string value)
 
@@ -68,11 +68,11 @@ lock_path=<%= scope.lookupvar("savanna::params::savanna_lockdir") %>
 
 # Print debugging output (set logging level to DEBUG instead
 # of default WARNING level). (boolean value)
-debug=<%= savanna_debug %>
+debug=<%= @savanna_debug %>
 
 # Print more verbose output (set logging level to INFO instead
 # of default WARNING level). (boolean value)
-verbose=<%= savanna_verbose %>
+verbose=<%= @savanna_verbose %>
 
 # Log output to standard error (boolean value)
 #use_stderr=true
@@ -200,7 +200,7 @@ node_domain=<%= scope.lookupvar("savanna::params::savanna_node_domain") %>
 
 # URL to database (string value)
 # connection=sqlite:////tmp/savanna-server.db
-connection=mysql://<%= savanna_db_user %>:<%= savanna_db_password %>@<%= db_host %>/<%= savanna_db_name %>
+connection=mysql://<%= @savanna_db_user %>:<%= @savanna_db_password %>@<%= @db_host %>/<%= @savanna_db_name %>
 
 
 #

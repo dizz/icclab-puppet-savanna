@@ -79,13 +79,13 @@ class savanna (
     exec { "savanna":
       command => "pip install ${savanna::params::development_build_url}",
       path => "/usr/bin:/usr/sbin:/bin:/usr/local/bin",
+      unless => "stat /usr/local/lib/python2.7/dist-packages/savanna",
+      require => Package['python-pip'],
     }
   } else {
     error('Please set horizon::params::development to true. Waiting for new release before using pip.')
   }
   
-  # scope.lookupvar("horizon::params::savana_dashboard") 
-
   group { 'savanna':
     ensure  => present,
     system  => true,
@@ -160,8 +160,9 @@ class savanna (
     error('Savanna cannot be installed on this operating system. It does not have the supported initscripts. There is only support for Debian-based systems.')
   }
 
+  # TODO: this runs everytime and so will destroy the DB everytime!
   exec { "savanna-db-manage":
-  	command   => "/usr/local/bin/savanna-db-manage --config-file /etc/savanna/savanna.conf current",
+  	command   => "/usr/local/bin/savanna-db-manage --config-file /etc/savanna/savanna.conf db-sync",
     logoutput => on_failure,
     require   => Class['savanna::db::mysql']
   } ~>
