@@ -1,7 +1,7 @@
 # icclab-puppet-savanna
 
-Installs the [savanna backend](https://launchpad.net/savanna)  
-If you want an [example of how it's used see this](https://github.com/dizz/puppet-openstack/blob/master/manifests/controller.pp#L478).  
-If you want to see [how to integrate this with Horizon](https://github.com/dizz/puppet-horizon) and [savannadashboard]
-(https://github.com/stackforge/savanna-dashboard) [see this](https://github.com/dizz/puppet-horizon)  
+Installs the [savanna backend](https://launchpad.net/savanna) 
+
+If you want an [example of how it's used see this](https://github.com/dizz/icclab-openstack-redux/blob/master/manifests/site.pp).
+
 Pull requests and suggstions gladly recevied!
