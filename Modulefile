@@ -15,11 +15,11 @@
 
 name    'icclab-savanna'
 version '0.0.1'
-source 'UNKNOWN'
+source 'https://github.com/dizz/icclab-puppet-savanna'
 author 'andy@edmonds.be'
 license 'Apache License, Version 2.0'
 summary 'Installs the savanna backend'
-description 'Installs the savanna backend'
+description 'Installs the savanna backend and can also install the savanna UI in OpenStack horizon'
 project_page 'https://github.com/dizz/icclab-puppet-savanna'
 
 ## Add dependencies, if any:

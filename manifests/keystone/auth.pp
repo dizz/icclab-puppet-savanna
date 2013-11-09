@@ -13,6 +13,10 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+#
+# Used to setup the savanna keystone user
+#
+
 class savanna::keystone::auth (
   $password,
   $auth_name          = 'savanna',

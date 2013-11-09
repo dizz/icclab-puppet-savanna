@@ -24,9 +24,10 @@ class savanna::params {
   $savanna_syslog              = false
   $savanna_usefips             = false
   $savanna_node_domain         = 'novalocal'
+  $savanna_db_sync_cmd         = '/usr/local/bin/savanna-db-manage --config-file /etc/savanna/savanna.conf db-sync'
   #installs source version from github builds
-  $development                 = true
-  $development_build_url       = 'http://tarballs.openstack.org/savanna/savanna-0.3.tar.gz#egg=savanna'
+  $development                 = false
+  $development_build_url       = 'http://tarballs.openstack.org/savanna/savanna-0.3.tar.gz'
   $development_dashboard_build_url = 'http://tarballs.openstack.org/savanna-dashboard/savanna-dashboard-0.3.tar.gz'
 
   #these two paths are OS specific - on redhat they're diff

@@ -13,14 +13,17 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+#
+# Used to create the savanna db
+#
+
 class savanna::db::mysql (
   $password,
   $dbname        = 'savanna',
   $user          = 'savanna',
   $host          = '127.0.0.1',
-  $allowed_hosts = undef,
+  $allowed_hosts = ['127.0.0.1'],
   $charset       = 'latin1',
-  $cluster_id    = 'localzone'
 ) {
 
   Class['mysql::server'] -> Class['savanna::db::mysql']

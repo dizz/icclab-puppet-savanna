@@ -29,165 +29,86 @@
 #
 # Here you should define a list of variables that this module would require.
 #
-# [*sample_variable*]
-#   Explanation of how this variable affects the funtion of this class and if it
-#   has a default. e.g. "The parameter enc_ntp_servers must be set by the
-#   External Node Classifier as a comma separated list of hostnames." (Note,
-#   global variables should not be used in preference to class parameters  as of
-#   Puppet 2.6.)
-#
+# [*savanna_host*]
+# The host on which the savanna process (API) runs. Defaults to '127.0.0.1'
+# [*savanna_port*]
+# The port on which the savanna process (API) runs on. Defaults to 3836
+# [*db_host*]
+# The host where the database is running. Savanna will use this to persist
+# information about clusters. Defaults to '127.0.0.1'
+# [*savanna_db_name*]
+# [*savanna_db_password*]
+# [*keystone_auth_protocol*]     
+# Defaults to 'http',
+# [*keystone_auth_host*]
+# Defaults to '127.0.0.1'
+# [*keystone_auth_port*]
+# Defaults to '35357'
+# [*keystone_user*]
+# Defaults to 'savanna'
+# [*keystone_password*]
+# Defaults to 'savanna'
+# [*keystone_tenant*]
+# Defaults to undef
+# [*savanna_verbose*]
+# Defaults to false
+# [*savanna_debug*]
+# Defaults to false
 # === Examples
 #
-#  class { savanna:
-#    servers => [ 'pool.ntp.org', 'ntp.local.company.com' ]
-#  }
+# class{'savanna':
+#   savanna_host              => '127.0.0.1',
+#   db_host                   => '127.0.0.1',
+#   savanna_db_password       => 'savanna',
+#   keystone_auth_host        => '127.0.0.1',
+#   keystone_password         => 'admin',
+#   savanna_verbose           => True,
+# } 
 #
 # === Authors
 #
 # Andy Edmonds <andy@edmonds.be>
 #
-# === Copyright
-#
-# Copyright 2013 Your name here, unless otherwise noted.
 #
 # TODOs
 # - need to install disk builder and create image
 #   or generate and install
 # - use a puppet type for configuration file
-# - structure into sub-manifests
 # - clean up documentation
 
 class savanna (
+
   $savanna_host              = '127.0.0.1',
   $savanna_port              = '8386',
+  $savanna_verbose           = false,
+  $savanna_debug             = false,
+  # db
   $db_host                   = '127.0.0.1',
   $savanna_db_name           = 'savanna',
   $savanna_db_user           = 'savanna',
   $savanna_db_password       = 'savanna',
+  # keystone 
   $keystone_auth_protocol    = 'http',
   $keystone_auth_host        = '127.0.0.1',
   $keystone_auth_port        = '35357',
   $keystone_user             = 'savanna',
   $keystone_password         = 'savanna',
   $keystone_tenant           = undef,
-  $savanna_verbose           = false,
-  $savanna_debug             = false,
-  $local_settings_template   = 'savanna/savanna.conf.erb',
 ) {
 
   include savanna::params
 
+  # move keystone and db classes here?
+  #TODO - review me!
   if !$keystone_tenant {
     $int_keystone_tenant = $keystone_user
   }else {
     $int_keystone_tenant = $keystone_tenant
   }
 
-  if !defined(Package['python-pip']) {
-      package { 'python-pip':
-      ensure => latest,
-    }
-  }
+  class { '::savanna::install': }  ->
 
-  if $savanna::params::development {
-    info("Installing and using the savanna development version. URL: ${savanna::params::development_build_url}")
-    exec { "savanna":
-      command => "pip install ${savanna::params::development_build_url}",
-      path => "/usr/bin:/usr/sbin:/bin:/usr/local/bin",
-      unless => "stat /usr/local/lib/python2.7/dist-packages/savanna",
-      require => Package['python-pip'],
-    }
-  } else {
-    error('Please set horizon::params::development to true. Waiting for new release before using pip.')
-  }
-  
-  group { 'savanna':
-    ensure  => present,
-    system  => true,
-  } ~>
+  class { '::savanna::db::sync': } ->
 
-  user { 'savanna':
-    ensure  => present,
-    gid     => 'savanna',
-    system  => true,
-    home    => '/var/lib/savanna',
-    shell   => '/bin/false'
-  } ~>
-
-  file { "/var/lib/savanna":
-    ensure => "directory",
-    owner  => "savanna",
-    group  => "savanna",
-    mode   => 750,
-  } ~>
-
-  file { "/var/log/savanna":
-    ensure => "directory",
-    owner  => "savanna",
-    group  => "savanna",
-    mode   => 750,
-  } ~>
-
-  file { "/var/log/savanna/savanna.log":
-    ensure => "file",
-    owner  => "savanna",
-    group  => "savanna",
-    mode   => 750,
-  } ~>
-
-  file { "/etc/savanna":
-  	ensure => "directory",
-    owner  => "savanna",
-    group  => "savanna",
-    mode   => 750,
-  } ~>
-
-  file { "/etc/savanna/savanna.conf":
-    path    => '/etc/savanna/savanna.conf',
-    ensure => file,
-    content => template($local_settings_template),
-    owner  => "savanna",
-    group  => "savanna",
-    mode   => 750,
-    before => Exec['savanna-db-manage']
-  }
-
-  if $::osfamily == 'Debian' {
-
-    file { "/etc/init.d/savanna-api":
-      path    => '/etc/init.d/savanna-api',
-      ensure => file,
-      content => template('savanna/savanna-api.erb'),
-      mode   => 755,
-      owner  => 'root',
-      group  => 'root',
-    } ~>
-
-    file { "/etc/savanna/savanna-api.conf":
-      path    => '/etc/init/savanna-api.conf',
-      ensure => file,
-      content => template('savanna/savanna-api.conf.erb'),
-      mode   => 755,
-      owner  => 'root',
-      group  => 'root',
-    }
-  } else {
-    error('Savanna cannot be installed on this operating system. It does not have the supported initscripts. There is only support for Debian-based systems.')
-  }
-
-  # TODO: this runs everytime and so will destroy the DB everytime!
-  exec { "savanna-db-manage":
-  	command   => "/usr/local/bin/savanna-db-manage --config-file /etc/savanna/savanna.conf db-sync",
-    logoutput => on_failure,
-    require   => Class['savanna::db::mysql'],
-    refreshonly => true
-  } ~>
-
-  #TODO(dizz) need to notify if service config changes
-  service { "savanna-api":
-    enable => true,
-  	ensure => running,
-  	hasrestart => true,
-  	hasstatus => true,
-  }
+  class { '::savanna::service': }
 }

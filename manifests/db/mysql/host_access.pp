@@ -12,10 +12,16 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+
 #
 # Used to grant access to the savanna mysql DB
 #
-define savanna::db::mysql::host_access ($user, $password, $database)  {
+
+define savanna::db::mysql::host_access (
+  $user, 
+  $password, 
+  $database
+) {
   database_user { "${user}@${name}":
     password_hash => mysql_password($password),
     provider      => 'mysql',
