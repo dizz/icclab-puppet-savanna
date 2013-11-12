@@ -22,7 +22,7 @@ class savanna::db::mysql (
   $dbname        = 'savanna',
   $user          = 'savanna',
   $host          = '127.0.0.1',
-  $allowed_hosts = ['127.0.0.1'],
+  $allowed_hosts = undef,     #['127.0.0.1'],
   $charset       = 'latin1',
 ) {
 
