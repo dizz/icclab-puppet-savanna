@@ -1,4 +1,4 @@
-# Copyright 2013 Zürcher Hochschule für Angewandte Wissenschaften
+# Copyright 2013 Zuercher Hochschule fuer Angewandte Wissenschaften
 # All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -38,7 +38,7 @@
 # information about clusters. Defaults to '127.0.0.1'
 # [*savanna_db_name*]
 # [*savanna_db_password*]
-# [*keystone_auth_protocol*]     
+# [*keystone_auth_protocol*]
 # Defaults to 'http',
 # [*keystone_auth_host*]
 # Defaults to '127.0.0.1'
@@ -63,7 +63,7 @@
 #   keystone_auth_host        => '127.0.0.1',
 #   keystone_password         => 'admin',
 #   savanna_verbose           => True,
-# } 
+#}
 #
 # === Authors
 #
@@ -77,38 +77,33 @@
 # - clean up documentation
 
 class savanna (
-
-  $savanna_host              = '127.0.0.1',
-  $savanna_port              = '8386',
-  $savanna_verbose           = false,
-  $savanna_debug             = false,
+  $savanna_host           = '127.0.0.1',
+  $savanna_port           = '8386',
+  $savanna_verbose        = false,
+  $savanna_debug          = false,
   # db
-  $db_host                   = '127.0.0.1',
-  $savanna_db_name           = 'savanna',
-  $savanna_db_user           = 'savanna',
-  $savanna_db_password       = 'savanna',
-  # keystone 
-  $keystone_auth_protocol    = 'http',
-  $keystone_auth_host        = '127.0.0.1',
-  $keystone_auth_port        = '35357',
-  $keystone_user             = 'savanna',
-  $keystone_password         = 'savanna',
-  $keystone_tenant           = undef,
-) {
-
+  $db_host                = '127.0.0.1',
+  $savanna_db_name        = 'savanna',
+  $savanna_db_user        = 'savanna',
+  $savanna_db_password    = 'savanna',
+  # keystone
+  $keystone_auth_protocol = 'http',
+  $keystone_auth_host     = '127.0.0.1',
+  $keystone_auth_port     = '35357',
+  $keystone_user          = 'savanna',
+  $keystone_password      = 'savanna',
+  $keystone_tenant        = undef,) {
   include savanna::params
 
   # move keystone and db classes here?
-  #TODO - review me!
+
   if !$keystone_tenant {
     $int_keystone_tenant = $keystone_user
-  }else {
+  } else {
     $int_keystone_tenant = $keystone_tenant
   }
 
-  class { '::savanna::install': }  ->
-
-  class { '::savanna::db::sync': } ->
-
+  class { '::savanna::install':
+  } ->
   class { '::savanna::service': }
 }

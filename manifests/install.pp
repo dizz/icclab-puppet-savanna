@@ -1,16 +1,25 @@
-# Class: savanna::install
+# Copyright 2013 Zuercher Hochschule fuer Angewandte Wissenschaften
+# All Rights Reserved.
 #
+#    Licensed under the Apache License, Version 2.0 (the "License"); you may
+#    not use this file except in compliance with the License. You may obtain
+#    a copy of the License at
 #
+#         http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+#    License for the specific language governing permissions and limitations
+#    under the License.
+
 class savanna::install {
-  
   include savanna::params
 
   # this is here until this fix is released
   # https://bugs.launchpad.net/ubuntu/+source/python-pbr/+bug/1245676
   if !defined(Package['git']) {
-    package { 'python-pip':
-      ensure => latest,
-    }
+    package { 'python-pip': ensure => latest, }
   }
 
   if !defined(Package['python-pip']) {
@@ -22,61 +31,56 @@ class savanna::install {
 
   if $savanna::params::development {
     info("Installing and using the savanna development version. URL: ${savanna::params::development_build_url}")
+
     exec { "savanna":
       command => "pip install ${savanna::params::development_build_url}",
-      path => "/usr/bin:/usr/sbin:/bin:/usr/local/bin",
-      unless => "stat /usr/local/lib/python2.7/dist-packages/savanna",
+      path    => "/usr/bin:/usr/sbin:/bin:/usr/local/bin",
+      unless  => "stat /usr/local/lib/python2.7/dist-packages/savanna",
       require => Package['python-pip'],
     }
   } else {
     package { "savanna":
-      ensure => installed,
+      ensure   => installed,
       provider => pip,
-      require => Package['python-pip'],
+      require  => Package['python-pip'],
     }
   }
-  
+
   group { 'savanna':
-    ensure  => present,
-    system  => true,
+    ensure => present,
+    system => true,
   } ->
-
   user { 'savanna':
-    ensure  => present,
-    gid     => 'savanna',
-    system  => true,
-    home    => '/var/lib/savanna',
-    shell   => '/bin/false'
+    ensure => present,
+    gid    => 'savanna',
+    system => true,
+    home   => '/var/lib/savanna',
+    shell  => '/bin/false'
   } ->
-
   file { "/var/lib/savanna":
     ensure => "directory",
     owner  => "savanna",
     group  => "savanna",
     mode   => 750,
   } ->
-
   file { "/var/log/savanna":
     ensure => "directory",
     owner  => "savanna",
     group  => "savanna",
     mode   => 750,
   } ->
-
   file { "/var/log/savanna/savanna.log":
     ensure => "file",
     owner  => "savanna",
     group  => "savanna",
     mode   => 750,
   } ->
-
   file { "/etc/savanna":
-  	ensure => "directory",
+    ensure => "directory",
     owner  => "savanna",
     group  => "savanna",
     mode   => 750,
   } ->
-
   file { "/etc/savanna/savanna.conf":
     path    => '/etc/savanna/savanna.conf',
     ensure  => file,
@@ -84,11 +88,10 @@ class savanna::install {
     owner   => "savanna",
     group   => "savanna",
     mode    => 750,
-    before  => Class['::savanna::db::sync']
+  # before  => Class['::savanna::db::sync']
   }
 
   if $::osfamily == 'Debian' {
-
     file { "/etc/init.d/savanna-api":
       path    => '/etc/init.d/savanna-api',
       ensure  => file,
@@ -97,7 +100,6 @@ class savanna::install {
       owner   => 'root',
       group   => 'root',
     } ->
-
     file { "/etc/savanna/savanna-api.conf":
       path    => '/etc/init/savanna-api.conf',
       ensure  => file,
@@ -108,6 +110,7 @@ class savanna::install {
       notify  => Service["savanna-api"],
     }
   } else {
-    error('Savanna cannot be installed on this operating system. It does not have the supported initscripts. There is only support for Debian-based systems.')
+    error('Savanna cannot be installed on this operating system. It does not have the supported initscripts. There is only support for Debian-based systems.'
+    )
   }
 }

@@ -1,4 +1,4 @@
-# Copyright 2013 Zürcher Hochschule für Angewandte Wissenschaften
+# Copyright 2013 Zuercher Hochschule fuer Angewandte Wissenschaften
 # All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -31,14 +31,12 @@ class savanna::keystone::auth (
   $public_port        = undef,
   $region             = 'RegionOne',
   $public_protocol    = 'http',
-  $internal_protocol  = 'http',
-) {
-
+  $internal_protocol  = 'http',) {
   # removed $volume_version     = 'v1',
 
   Keystone_user_role["${auth_name}@${tenant}"] ~> Service <| name == 'savanna-api' |>
 
-  if ! $public_port {
+  if !$public_port {
     $real_public_port = $port
   } else {
     $real_public_port = $public_port
@@ -50,10 +48,12 @@ class savanna::keystone::auth (
     email    => $email,
     tenant   => $tenant,
   }
+
   keystone_user_role { "${auth_name}@${tenant}":
-    ensure  => present,
-    roles   => 'admin',
+    ensure => present,
+    roles  => 'admin',
   }
+
   keystone_service { $auth_name:
     ensure      => present,
     type        => $service_type,
@@ -63,7 +63,6 @@ class savanna::keystone::auth (
   # public_url   => "${public_protocol}://${public_address}:${port}/${volume_version}/%(tenant_id)s",
   # admin_url    => "http://${admin_address}:${port}/${volume_version}/%(tenant_id)s",
   # internal_url => "http://${internal_address}:${port}/${volume_version}/%(tenant_id)s",
-  # TODO - fix me
   if $configure_endpoint {
     keystone_endpoint { "${region}/${auth_name}":
       ensure       => present,

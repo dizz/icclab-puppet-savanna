@@ -1,4 +1,4 @@
-# Copyright 2013 Zürcher Hochschule für Angewandte Wissenschaften
+# Copyright 2013 Zuercher Hochschule fuer Angewandte Wissenschaften
 # All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -17,16 +17,13 @@
 # Used to grant access to the savanna mysql DB
 #
 
-define savanna::db::mysql::host_access (
-  $user, 
-  $password, 
-  $database
-) {
+define savanna::db::mysql::host_access ($user, $password, $database) {
   database_user { "${user}@${name}":
     password_hash => mysql_password($password),
     provider      => 'mysql',
     require       => Database[$database],
   }
+
   database_grant { "${user}@${name}/${database}":
     # TODO figure out which privileges to grant.
     privileges => 'all',
