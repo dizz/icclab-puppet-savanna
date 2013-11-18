@@ -29,6 +29,13 @@ class savanna::install {
     }
   }
 
+  if !defined(Package['python-dev']) {
+    package { 'python-dev':
+      ensure  => latest,
+      require => Package['pip']
+    }
+  }
+
   if $savanna::params::development {
     info("Installing and using the savanna development version. URL: ${savanna::params::development_build_url}")
 
@@ -88,7 +95,6 @@ class savanna::install {
     owner   => "savanna",
     group   => "savanna",
     mode    => 750,
-  # before  => Class['::savanna::db::sync']
   }
 
   if $::osfamily == 'Debian' {
