@@ -32,7 +32,7 @@ class savanna::install {
   if !defined(Package['python-dev']) {
     package { 'python-dev':
       ensure  => latest,
-      require => Package['pip']
+      require => Package['python-pip']
     }
   }
 
